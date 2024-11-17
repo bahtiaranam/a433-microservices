@@ -1,0 +1,50 @@
+# menentukan versi docker-compose
+version: "3.8"
+
+# mendefinisikan services
+services:
+  # service item-app
+  item-app:
+    # menggunakan image bahtiaranam/item-app:v1
+    image: bahtiaranam/item-app:v1
+    # command yang dijalankan
+    command: sh -c "yarn install --production --unsafe-perm && yarn start"
+    # port yang di-expose
+    ports:
+      - 80:8080
+    # network yang digunakan
+    networks:
+      - item-app-net
+    # environment yang digunakan
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=item-db
+    # bergantung pada service item-db
+    depends_on:
+      - item-db
+    # restart ketika on-failure
+    restart: on-failure
+
+  # service item-db
+  item-db:
+    # menggunakan image mongo:3.6
+    image: mongo:3.6
+    # port yang digunakan
+    ports:
+      - 27017:27017
+    # network yang digunakan
+    networks:
+      - item-app-net
+    # volumes yang digunakan
+    volumes:
+      - app-db:/data/db
+    # restart ketika on-failure
+    restart: on-failure
+
+# mendefinisikan volumes
+volumes:
+  app-db:
+
+# mendefinisikan networks
+networks:
+  item-app-net:
